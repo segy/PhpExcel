@@ -18,10 +18,10 @@ class PhpExcelHelper extends AppHelper {
 	 */
 	protected $row = 1;
 	/**
-	 * Array of excel columns for simplified access 
+	 * Internal table params 
 	 * @var array
 	 */
-	protected $columns = array('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z');
+	protected $tableParams;
 	
 	/**
 	 * Constructor
@@ -47,16 +47,6 @@ class PhpExcelHelper extends AppHelper {
 	}
 	
 	/**
-	 * Load vendor classes
-	 */
-	protected function loadEssentials() {
-		// load vendor class
-		App::import('Vendor', 'PHPExcel', array('file' => 'phpexcel/Classes/PHPExcel.php')); 
-		if (!class_exists('PHPExcel'))
-			throw new CakeException('Vendor class PHPExcel not found!');
-	}
-	
-	/**
 	 * Set row pointer
 	 */
 	public function setRow($to) {
@@ -72,13 +62,107 @@ class PhpExcelHelper extends AppHelper {
 	}
 	
 	/**
+	 * Start table
+	 * inserts table header and sets table params
+	 * Possible keys for data:
+	 * 	label 	-	table heading
+	 * 	width	-	"auto" or units
+	 * 	filter	-	true to set excel filter for column
+	 * 	wrap	-	true to wrap text in column
+	 * Possible keys for params:
+	 * 	offset	-	column offset (numeric or text)
+	 * 	font	-	font name
+	 * 	size	-	font size
+	 * 	bold	-	true for bold text
+	 * 	italic	-	true for italic text
+	 * 	
+	 */
+	public function addTableHeader($data, $params = array()) {
+		// offset
+		if (array_key_exists('offset', $params))
+			$offset = is_numeric($params['offset']) ? (int)$params['offset'] : PHPExcel_Cell::columnIndexFromString($params['offset']);
+		// font name
+		if (array_key_exists('font', $params))
+			$this->xls->getActiveSheet()->getStyle($this->row)->getFont()->setName($params['font_name']);
+		// font size
+		if (array_key_exists('size', $params))
+			$this->xls->getActiveSheet()->getStyle($this->row)->getFont()->setSize($params['font_size']);
+		// bold
+		if (array_key_exists('bold', $params))
+			$this->xls->getActiveSheet()->getStyle($this->row)->getFont()->setBold($params['bold']);
+		// italic
+		if (array_key_exists('italic', $params))
+			$this->xls->getActiveSheet()->getStyle($this->row)->getFont()->setItalic($params['italic']);
+		
+		// set internal params that need to be processed after data are inserted
+		$this->tableParams = array(
+			'header_row' => $this->row,
+			'offset' => $offset,
+			'row_count' => 0,
+			'auto_width' => array(),
+			'filter' => array(),
+			'wrap' => array()
+		);
+		
+		foreach ($data as $d) {
+			// set label
+			$this->xls->getActiveSheet()->setCellValueByColumnAndRow($offset, $this->row, $d['label']);
+			// set width
+			if (array_key_exists('width', $d)) {
+				if ($d['width'] == 'auto')
+					$this->tableParams['auto_width'][] = $offset;
+				else
+					$this->xls->getActiveSheet()->getColumnDimensionByColumn($offset)->setWidth((float)$d['width']);
+			}
+			// filter
+			if (array_key_exists('filter', $d) && $d['filter'])
+				$this->tableParams['filter'][] = $offset;
+			// wrap
+			if (array_key_exists('wrap', $d) && $d['wrap'])
+				$this->tableParams['wrap'][] = $offset;
+			
+			$offset++;
+		}
+		$this->row++;	
+	}
+	
+	/**
+	 * Write array of data to actual row
+	 */
+	public function addTableRow($data) {
+		$offset = $this->tableParams['offset'];
+		
+		foreach ($data as $d) {
+			$this->xls->getActiveSheet()->setCellValueByColumnAndRow($offset++, $this->row, $d);
+		}
+		$this->row++;
+		$this->tableParams['row_count']++;
+	}
+	
+	/**
+	 * End table
+	 * sets params and styles that required data to be inserted
+	 */
+	public function addTableFooter() {
+		// auto width
+		foreach ($this->tableParams['auto_width'] as $col)
+			$this->xls->getActiveSheet()->getColumnDimensionByColumn($col)->setAutoSize(true);
+		// filter (has to be set for whole range)
+		if (count($this->tableParams['filter']))
+			$this->xls->getActiveSheet()->setAutoFilter(PHPExcel_Cell::stringFromColumnIndex($this->tableParams['filter'][0]).($this->tableParams['header_row']).':'.PHPExcel_Cell::stringFromColumnIndex($this->tableParams['filter'][count($this->tableParams['filter']) - 1]).($this->tableParams['header_row'] + $this->tableParams['row_count']));
+		// wrap
+		foreach ($this->tableParams['wrap'] as $col)
+			$this->xls->getActiveSheet()->getStyle(PHPExcel_Cell::stringFromColumnIndex($col).($this->tableParams['header_row'] + 1).':'.PHPExcel_Cell::stringFromColumnIndex($col).($this->tableParams['header_row'] + $this->tableParams['row_count']))->getAlignment()->setWrapText(true);
+	}
+	
+	/**
 	 * Write array of data to actual row starting from column defined by offset
 	 * Offset can be textual or numeric representation
 	 */
-	public function addRow($data, $offset = 0) {
+	public function addData($data, $offset = 0) {
 		// solve textual representation
 		if (!is_numeric($offset))
-			$offset = $this->columnNumber($offset);
+			$offset = PHPExcel_Cell::columnIndexFromString($offset);
 		
 		foreach ($data as $d) {
 			$this->xls->getActiveSheet()->setCellValueByColumnAndRow($offset++, $this->row, $d);
@@ -99,33 +183,17 @@ class PhpExcelHelper extends AppHelper {
 		// writer
 		$objWriter = PHPExcel_IOFactory::createWriter($this->xls, 'Excel2007');
 		$objWriter->save('php://output');
+		// clear memory
+		$this->xls->disconnectWorksheets();
 	}
 	
 	/**
-	 * Textual representation of column number
+	 * Load vendor classes
 	 */
-	protected function columnText($col) {
-		$count = count($this->columns);
-		$pref = floor($col / $count);
-		return ($pref > 0 ? $this->columns[$pref - 1] : '').$this->columns[$col % $count]; 
-	}
-	
-	/**
-	 * Numeric representation of column text
-	 */
-	protected function columnNumber($col) {
-		// sanity check
-		if (strlen($col) > 2)
-			return 0;
-		
-		$count = count($this->columns);
-		if (strlen($col) > 1) {
-			$pref = array_search($col{0}, $this->columns) + 1;
-			$col = $col{1};
-		}
-		else
-			$pref = 0;
-		
-		return $pref * $count + array_search($col, $this->columns); 
+	protected function loadEssentials() {
+		// load vendor class
+		App::import('Vendor', 'PHPExcel', array('file' => 'phpexcel/Classes/PHPExcel.php')); 
+		if (!class_exists('PHPExcel'))
+			throw new CakeException('Vendor class PHPExcel not found!');
 	}
 }
