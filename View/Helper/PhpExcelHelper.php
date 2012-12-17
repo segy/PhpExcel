@@ -192,8 +192,9 @@ class PhpExcelHelper extends AppHelper {
 	 */
 	protected function loadEssentials() {
 		// load vendor class
-		App::import('Vendor', 'PHPExcel', array('file' => 'phpexcel/Classes/PHPExcel.php')); 
-		if (!class_exists('PHPExcel'))
+		App::import('Vendor', 'PHPExcel/Classes/PHPExcel');
+		if (!class_exists('PHPExcel')) {
 			throw new CakeException('Vendor class PHPExcel not found!');
+		}
 	}
 }
