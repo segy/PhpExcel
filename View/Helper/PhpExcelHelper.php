@@ -79,6 +79,7 @@ class PhpExcelHelper extends AppHelper {
 	 */
 	public function addTableHeader($data, $params = array()) {
 		// offset
+		$offset = 0;
 		if (array_key_exists('offset', $params))
 			$offset = is_numeric($params['offset']) ? (int)$params['offset'] : PHPExcel_Cell::columnIndexFromString($params['offset']);
 		// font name
