@@ -10,7 +10,7 @@ Short example:
 
 Controller:
 
-public $helpers = array('PhpExcel.PhpExcel'); 
+public $helpers = array('PhpExcel'); 
 
 View:
 
