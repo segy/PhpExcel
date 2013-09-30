@@ -175,6 +175,17 @@ class PhpExcelHelper extends AppHelper {
 	}
 	
 	/**
+	 * Add worksheet name to worksheet
+	 * 
+	 * @param string $name
+	 */
+	public function addWorksheetName($name) {
+		if(strlen($name) > 0) {
+			$this->xls->getActiveSheet()->setTitle($name);
+		}
+	}
+	
+	/**
 	 * Output file to browser
 	 */
 	public function output($filename = 'export.xlsx') {
