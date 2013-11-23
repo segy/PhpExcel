@@ -78,6 +78,10 @@ class PhpExcelHelper extends AppHelper {
 	 * 	
 	 */
 	public function addTableHeader($data, $params = array()) {
+		
+		// offset
+		$offset = 0;
+		
 		// offset
 		if (array_key_exists('offset', $params))
 			$offset = is_numeric($params['offset']) ? (int)$params['offset'] : PHPExcel_Cell::columnIndexFromString($params['offset']);
@@ -168,6 +172,17 @@ class PhpExcelHelper extends AppHelper {
 			$this->xls->getActiveSheet()->setCellValueByColumnAndRow($offset++, $this->row, $d);
 		}
 		$this->row++;
+	}
+	
+	/**
+	 * Add worksheet name to worksheet
+	 * 
+	 * @param string $name
+	 */
+	public function addWorksheetName($name) {
+		if(strlen($name) > 0) {
+			$this->xls->getActiveSheet()->setTitle($name);
+		}
 	}
 	
 	/**
