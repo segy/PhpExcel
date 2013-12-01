@@ -2,12 +2,10 @@
 
 PHPExcel is a great library that can create XLS files. For more information see [PHPExcel project homepage](http://phpexcel.codeplex.com/).
 
-I added method for setting font and for easy table data adding (see example).
-
-Short example:
+I added method for setting font and for easy table data adding. Short example:
 
     // create new empty worksheet and set default font
-    $this->PhpExcel->createWorksheet();
+    $this->PhpExcel->createWorksheet()
         ->setDefaultFont('Calibri', 12);
 
     // define table cells
@@ -34,5 +32,5 @@ Short example:
     }
 
     // close table and output
-    $this->PhpExcel->addTableFooter();
+    $this->PhpExcel->addTableFooter()
         ->output();
