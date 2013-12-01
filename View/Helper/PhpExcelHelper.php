@@ -126,7 +126,7 @@ class PhpExcelHelper extends PhpExcelAppHelper {
      *   italic  -   true for italic header text
      * @return $this for method chaining
      */
-    public function setTableHeader($data, $params = array()) {
+    public function addTableHeader($data, $params = array()) {
         // offset
         $offset = 0;
         if (isset($params['offset']))
