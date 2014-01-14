@@ -1,13 +1,13 @@
 <?php
-App::uses('PhpExcelAppHelper', 'PhpExcel.View/Helper');
+App::uses('Component', 'Controller');
 
 /**
- * Helper for working with PHPExcel class.
+ * Component for working with PHPExcel class.
  *
  * @package PhpExcel
  * @author segy
  */
-class PhpExcelHelper extends PhpExcelAppHelper {
+class PhpExcelComponent extends Component {
     /**
      * Instance of PHPExcel class
      *
