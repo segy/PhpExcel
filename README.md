@@ -1,4 +1,4 @@
-# PhpExcel helper and component for for CakePHP 2.x
+# PhpExcel helper and component for CakePHP 2.x
 
 PHPExcel is a great library that can create XLS files. For more information see [PHPExcel project homepage](http://phpexcel.codeplex.com/).
 
