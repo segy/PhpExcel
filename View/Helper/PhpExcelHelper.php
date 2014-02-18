@@ -1,5 +1,5 @@
 <?php
-App::uses('PhpExcelAppHelper', 'PhpExcel.View/Helper');
+App::uses('AppHelper', 'View/Helper');
 
 /**
  * Helper for working with PHPExcel class.
@@ -7,7 +7,7 @@ App::uses('PhpExcelAppHelper', 'PhpExcel.View/Helper');
  * @package PhpExcel
  * @author segy
  */
-class PhpExcelHelper extends PhpExcelAppHelper {
+class PhpExcelHelper extends AppHelper {
     /**
      * Instance of PHPExcel class
      *
