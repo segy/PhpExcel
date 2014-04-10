@@ -342,4 +342,14 @@ class PhpExcelComponent extends Component {
 
         exit;
     }
+
+    /**
+     * Free memory
+     *
+     * @return void
+     */
+    public function freeMemory() {
+        $this->_xls->disconnectWorksheets();
+        unset($this->_xls);
+    }
 }
