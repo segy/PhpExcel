@@ -6,5 +6,8 @@
     "authors": [],
     "require" : {
         "composer/installers": "*"
+    },
+    "extra": {
+        "installer-name" : "PhpExcel"
     }
 }
