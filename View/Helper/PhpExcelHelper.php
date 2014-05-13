@@ -43,7 +43,7 @@ class PhpExcelHelper extends AppHelper {
      */
     public function createWorksheet() {
         // load vendor classes
-        App::import('Vendor', 'PhpExcel.PHPExcel');
+        App::import('Vendor', 'PHPExcel');
 
         $this->_xls = new PHPExcel();
         $this->_row = 1;
