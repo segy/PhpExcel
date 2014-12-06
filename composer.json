@@ -1,5 +1,5 @@
 {
-    "name": "ali1/cakephp-phpexcel",
+    "name": "busgurlu/cakephp-phpexcel",
     "description" : "PhpExcel helper and component for CakePHP 2.x",
     "license" : "WTFPL",
     "type" : "cakephp-plugin",
