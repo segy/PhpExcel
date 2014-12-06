@@ -1,0 +1,13 @@
+{
+    "name": "ali1/cakephp-phpexcel",
+    "description" : "PhpExcel helper and component for CakePHP 2.x",
+    "license" : "WTFPL",
+    "type" : "cakephp-plugin",
+    "authors": [],
+    "require" : {
+        "composer/installers": "*"
+    },
+    "extra": {
+        "installer-name" : "PhpExcel"
+    }
+}
