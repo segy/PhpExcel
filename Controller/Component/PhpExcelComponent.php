@@ -215,7 +215,9 @@ class PhpExcelComponent extends Component {
 
             $offset++;
         }
-        $this->_row++;
+        
+        if (count($data))
+            $this->_row++;
 
         return $this;
     }
