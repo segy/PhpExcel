@@ -43,7 +43,7 @@ class PhpExcelComponent extends Component {
      */
     public function createWorksheet() {
         // load vendor classes
-        App::import('Vendor', 'PhpExcel.PHPExcel');
+    	App::import('Vendor', 'PhpExcel.PHPExcel');
         		
         $this->_xls = new PHPExcel();
         $this->_row = 1;
@@ -193,6 +193,8 @@ class PhpExcelComponent extends Component {
      *   size    -   font size of the header text
      *   bold    -   true for bold header text
      *   italic  -   true for italic header text
+     *   color   -   ARGB value for header text color
+     *   fill-type - one of the fill tyles defined in PHPExcel_Style_Fill
      * @return $this for method chaining
      */
     public function addTableHeader($data, $params = array()) {
@@ -201,6 +203,8 @@ class PhpExcelComponent extends Component {
         if (isset($params['offset']))
             $offset = is_numeric($params['offset']) ? (int)$params['offset'] : PHPExcel_Cell::columnIndexFromString($params['offset']);
 
+        $this->readParams($params);
+        
         // set internal params that need to be processed after data are inserted
         $this->_tableParams = array(
             'header_row' => $this->_row,
@@ -240,6 +244,14 @@ class PhpExcelComponent extends Component {
      * Write array of data to current row
      *
      * @param array $data
+     *  @param array $params table parameters with format:
+     *   offset  -   column offset (numeric or text)
+     *   font    -   font name of the text
+     *   size    -   font size of the text
+     *   bold    -   true for bold text
+     *   italic  -   true for italic text
+     *   color   -   ARGB value for text color
+     *   fill-type - one of the fill tyles defined in PHPExcel_Style_Fill
      * @return $this for method chaining
      */
     public function addTableRow($data, $params = array()) {
