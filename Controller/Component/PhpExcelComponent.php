@@ -43,8 +43,8 @@ class PhpExcelComponent extends Component {
      */
     public function createWorksheet() {
         // load vendor classes
-        App::import('Vendor', 'PhpExcel.PHPExcel');
-
+    	App::import('Vendor', 'PhpExcel.PHPExcel');
+        		
         $this->_xls = new PHPExcel();
         $this->_row = 1;
 
@@ -146,6 +146,38 @@ class PhpExcelComponent extends Component {
 
         return $this;
     }
+    
+    /**
+     * Process style parameters
+     *
+     * @param params $params
+     */
+    private function readParams($params){
+    	 
+    	// font name
+    	if (isset($params['font']))
+    		$this->_xls->getActiveSheet()->getStyle($this->_row)->getFont()->setName($params['font']);
+    	 
+    	// font size
+    	if (isset($params['size']))
+    		$this->_xls->getActiveSheet()->getStyle($this->_row)->getFont()->setSize($params['size']);
+    	 
+    	// bold
+    	if (isset($params['bold']))
+    		$this->_xls->getActiveSheet()->getStyle($this->_row)->getFont()->setBold($params['bold']);
+    	 
+    	// italic
+    	if (isset($params['italic']))
+    		$this->_xls->getActiveSheet()->getStyle($this->_row)->getFont()->setItalic($params['italic']);
+    	 
+    	// font color
+    	if (isset($params['color']))
+    		$this->_xls->getActiveSheet()->getStyle($this->_row)->getFont()->setColor(new PHPExcel_Style_Color($params['color']));
+    	 
+    	// fill type
+    	if (isset($params['fill-type']))
+    		$this->_xls->getActiveSheet()->getStyle($this->_row)->getFill()->setFillType($params['fill-type']);
+    }
 
     /**
      * Start table - insert table header and set table params
@@ -161,6 +193,8 @@ class PhpExcelComponent extends Component {
      *   size    -   font size of the header text
      *   bold    -   true for bold header text
      *   italic  -   true for italic header text
+     *   color   -   ARGB value for header text color
+     *   fill-type - one of the fill tyles defined in PHPExcel_Style_Fill
      * @return $this for method chaining
      */
     public function addTableHeader($data, $params = array()) {
@@ -169,22 +203,8 @@ class PhpExcelComponent extends Component {
         if (isset($params['offset']))
             $offset = is_numeric($params['offset']) ? (int)$params['offset'] : PHPExcel_Cell::columnIndexFromString($params['offset']);
 
-        // font name
-        if (isset($params['font']))
-            $this->_xls->getActiveSheet()->getStyle($this->_row)->getFont()->setName($params['font']);
-
-        // font size
-        if (isset($params['size']))
-            $this->_xls->getActiveSheet()->getStyle($this->_row)->getFont()->setSize($params['size']);
-
-        // bold
-        if (isset($params['bold']))
-            $this->_xls->getActiveSheet()->getStyle($this->_row)->getFont()->setBold($params['bold']);
-
-        // italic
-        if (isset($params['italic']))
-            $this->_xls->getActiveSheet()->getStyle($this->_row)->getFont()->setItalic($params['italic']);
-
+        $this->readParams($params);
+        
         // set internal params that need to be processed after data are inserted
         $this->_tableParams = array(
             'header_row' => $this->_row,
@@ -219,16 +239,31 @@ class PhpExcelComponent extends Component {
 
         return $this;
     }
-
+    
     /**
      * Write array of data to current row
      *
      * @param array $data
+     *  @param array $params table parameters with format:
+     *   offset  -   column offset (numeric or text)
+     *   font    -   font name of the text
+     *   size    -   font size of the text
+     *   bold    -   true for bold text
+     *   italic  -   true for italic text
+     *   color   -   ARGB value for text color
+     *   fill-type - one of the fill tyles defined in PHPExcel_Style_Fill
      * @return $this for method chaining
      */
-    public function addTableRow($data) {
+    public function addTableRow($data, $params = array()) {
         $offset = $this->_tableParams['offset'];
 
+        // offset
+        $offset = 0;
+        if (isset($params['offset']))
+        	$offset = is_numeric($params['offset']) ? (int)$params['offset'] : PHPExcel_Cell::columnIndexFromString($params['offset']);
+        
+        $this->readParams($params);
+        
         foreach ($data as $d)
             $this->_xls->getActiveSheet()->setCellValueByColumnAndRow($offset++, $this->_row, $d);
 
