@@ -338,6 +338,7 @@ class PhpExcelHelper extends AppHelper {
 
         // writer
         $objWriter = $this->getWriter($writer);
+        $objWriter->setPreCalculateFormulas(true);
         $objWriter->save('php://output');
 
         exit;
